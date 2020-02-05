@@ -5,7 +5,7 @@ ext {
     // defaultConfig
     compileSdkVersion = 28
     applicationId = "com.mobileapps.myphonebook"
-    minSdkVersion = 23
+    minSdkVersion = 24
     targetSdkVersion = 28
 
     // dependencies

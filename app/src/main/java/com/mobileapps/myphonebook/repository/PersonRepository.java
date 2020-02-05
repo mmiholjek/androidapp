@@ -2,53 +2,109 @@ package com.mobileapps.myphonebook.repository;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.mobileapps.myphonebook.model.Person;
+import com.mobileapps.myphonebook.BuildConfig;
+import com.mobileapps.myphonebook.network.PersonService;
+import com.mobileapps.myphonebook.network.data.Person;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PersonRepository {
 
     private static PersonRepository instance;
 
-    public static PersonRepository getInstance(){
-        if(instance == null){
+    private Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+    public static PersonRepository getInstance() {
+        if (instance == null) {
             instance = new PersonRepository();
         }
         return instance;
     }
 
     private List<Person> people = new ArrayList<>();
-    private MutableLiveData<List<Person>> liveDataPersons = new MutableLiveData<>();
+    private MutableLiveData<List<Person>> peopleLiveData = new MutableLiveData<>();
 
-    private PersonRepository(){initRepository();}
-
-    private void initRepository(){
-        people = new ArrayList<Person>(){{
-            add(new Person(1,"Pero","Perić","Zagrebačka 5, Osijek","Hrvatska","pero.peric@gmail.com","+385 98 123 4567","Mobile d.o.o.","https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"));
-            add(new Person(2,"Luka","Lukić","Osiječka 55, Split","Hrvatska","llukic@yahoo.com","+385 92 987 3216","DevOfTomorrow j.d.o.o.","https://i.dailymail.co.uk/i/pix/2013/08/29/article-2405475-1B8389EE000005DC-718_634x550.jpg"));
-            add(new Person(3,"Ivo","Ivić","Splitska 555, Zagreb","Hrvatska","ivo.ivic@gmail.com","+385 97 654 4531","Ivic & co.","https://media.distractify.com/brand-img/adCWlmDCl/480x252/matt-brown-alaskan-bush-people-now-1574876386822.jpg"));
-        }};
-        liveDataPersons= new MutableLiveData<>();
-        liveDataPersons.setValue(people);
+    private PersonRepository() {
     }
 
-    public MutableLiveData<List<Person>> getPeople(){return liveDataPersons;}
 
-    public Person findPersonById(long id){
-        if(liveDataPersons.getValue() == null){
+    public MutableLiveData<List<Person>> getPeople() {
+        retrofit.create(PersonService.class)
+                .getPeople(6)
+                .enqueue(new Callback<List<Person>>() {
+
+                    @Override
+                    public void onResponse(Call<List<Person>> call, Response<List<Person>> response) {
+                        List<Person> persons = response.body();
+                        if (persons != null) {
+                            persons = persons.stream().map(person -> {
+                                person.setUuid(UUID.randomUUID());
+                                return person;
+                            }).collect(Collectors.toList());
+                        }
+                        peopleLiveData.postValue(persons);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Person>> call, Throwable t) {
+                        peopleLiveData.postValue(null);
+                    }
+                });
+
+        return peopleLiveData;
+    }
+
+    public Person findPersonById(UUID id) {
+        if (peopleLiveData.getValue() == null) {
             return null;
         }
-        for (Person person : liveDataPersons.getValue()){
-            if (person.getId() == id){
+
+        for (Person person : peopleLiveData.getValue()) {
+            if (person.getUuid().equals(id)) {
                 return person;
             }
         }
         return null;
     }
 
-    public void addPerson(Person person){
-        people.add(person);
-        liveDataPersons.setValue(people);
+    public MutableLiveData<List<Person>> addPerson() {
+        retrofit.create(PersonService.class)
+                .getPerson()
+                .enqueue(new Callback<Person>() {
+
+                    @Override
+                    public void onResponse(Call<Person> call, Response<Person> response) {
+                        Person person = response.body();
+                        List<Person> existingPersons = peopleLiveData.getValue();
+                        if (existingPersons == null) {
+                            existingPersons = new ArrayList<>();
+                        }
+                        if (person != null) {
+                            person.setUuid(UUID.randomUUID());
+                            existingPersons.add(person);
+                        }
+
+                        peopleLiveData.postValue(existingPersons);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Person> call, Throwable t) {
+                        peopleLiveData.postValue(null);
+                    }
+                });
+
+        return peopleLiveData;
     }
 }

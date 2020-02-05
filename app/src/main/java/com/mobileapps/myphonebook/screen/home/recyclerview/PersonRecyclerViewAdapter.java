@@ -1,4 +1,4 @@
-package com.mobileapps.myphonebook.screen.home.fragment;
+package com.mobileapps.myphonebook.screen.home.recyclerview;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.mobileapps.myphonebook.R;
-import com.mobileapps.myphonebook.model.Person;
+import com.mobileapps.myphonebook.network.data.Person;
 
 import java.util.List;
 
 
 public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecyclerViewAdapter.PersonViewHolder> {
 
-    public interface RecyclerViewEventListener{
+    public interface RecyclerViewEventListener {
         void onItemClick(View view, int position, Person person);
     }
 
@@ -41,9 +41,14 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
     private List<Person> people;
     private RecyclerViewEventListener listener;
 
-    PersonRecyclerViewAdapter(List<Person> people, RecyclerViewEventListener listener){
+    public PersonRecyclerViewAdapter(List<Person> people, RecyclerViewEventListener listener) {
         this.people = people;
         this.listener = listener;
+    }
+
+    public void setItems(List<Person> items) {
+        people = items;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -62,7 +67,7 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         holder.nameTextView.setText(person.getName());
         holder.surnameTextView.setText(person.getSurname());
         Glide.with(holder.itemView.getContext())
-                .load(person.getImageUrl())
+                .load(person.getPhoto())
                 .placeholder(R.drawable.logo)
                 .into(holder.personImageView);
     }
