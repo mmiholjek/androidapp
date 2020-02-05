@@ -5,6 +5,10 @@ Tip auntetifikacije:
 Predefinirani korisnik
 Google Sign In
 
+Predefinirani korisnik - user@app.com 
+				  Pass - password
+				  
+
 API's;
 Google Sign In
 UiNames
