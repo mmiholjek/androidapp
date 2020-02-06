@@ -54,7 +54,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <Button
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
@@ -63,5 +62,13 @@
         android:background="@color/colorAccent"
         android:text="@string/label_login"
         android:textColor="@android:color/white" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:padding="15dp"/>
+
 
 </LinearLayout>

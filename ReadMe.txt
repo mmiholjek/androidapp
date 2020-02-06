@@ -6,7 +6,7 @@ Predefinirani korisnik
 Google Sign In
 
 Predefinirani korisnik - user@app.com 
-				  Pass - password
+	      Pass - password
 				  
 
 API's;
@@ -14,7 +14,7 @@ Google Sign In
 UiNames
 
 Link na prezentaciju
-https://drive.google.com/open?id=1FT-83DXHz3V8t4ccbBI84z9J00p1zWWY
+https://drive.google.com/open?id=13uZqcQ3oMlDTUFkfGSFrP0ea-FqsnfqK
 
 
 
